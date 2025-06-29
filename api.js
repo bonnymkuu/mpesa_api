@@ -1,14 +1,3 @@
-/*
-  Author: Alvin Kiveu
-  Description: Mpesa Daraja API with Node JS
-  Date: 23/10/2023
-  Github Link: https://github.com/alvin-kiveu/Mpesa-Daraja-Api-NODE.JS.git
-  Website: www.umeskiasoftwares.com
-  Email: info@umeskiasoftwares.com
-  Phone: +254113015674
-  
-*/
-
 const express = require('express');
 const router = express.Router();
 const axios = require("axios");

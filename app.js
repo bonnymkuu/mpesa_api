@@ -1,14 +1,3 @@
-/*
-  Author: Alvin Kiveu
-  Description: Mpesa Daraja API with Node JS
-  Date: 23/10/2023
-  Github Link: https://github.com/alvin-kiveu/Mpesa-Daraja-Api-NODE.JS.git
-  Website: www.umeskiasoftwares.com
-  Email: info@umeskiasoftwares.com
-  Phone: +254113015674
-  
-*/
-
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -19,9 +8,9 @@ const apiRouter = require('./api');
 const cors = require("cors");
 const fs = require("fs");
 
-
-const port = 5000;
+const port = process.env.PORT;
 const hostname = "localhost";
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
@@ -31,10 +20,9 @@ const server = http.createServer(app);
 
 // ACCESS TOKEN FUNCTION - Updated to use 'axios'
 async function getAccessToken() {
-  const consumer_key = ""; // REPLACE IT WITH YOUR CONSUMER KEY
-  const consumer_secret = ""; // REPLACE IT WITH YOUR CONSUMER SECRET
-  const url =
-    "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+  const consumer_key = process.env.MPESA_CONSUMER_KEY;
+  const consumer_secret = process.env.MPESA_CONSUMER_SECRET;
+  const url = process.env.MPESA_URL;
   const auth =
     "Basic " +
     new Buffer.from(consumer_key + ":" + consumer_secret).toString("base64");
@@ -56,7 +44,7 @@ async function getAccessToken() {
 }
 
 app.get("/", (req, res) => {
-  res.send("MPESA DARAJA API WITH NODE JS BY UMESKIA SOFTWARES");
+  res.send("MPESA DARAJA API WITH NODE JS");
   var timeStamp = moment().format("YYYYMMDDHHmmss");
   console.log(timeStamp);
 });
@@ -75,13 +63,12 @@ app.get("/access_token", (req, res) => {
 app.get("/stkpush", (req, res) => {
   getAccessToken()
     .then((accessToken) => {
-      const url =
-        "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+      const url = process.env.MPESA_URL;
       const auth = "Bearer " + accessToken;
       const timestamp = moment().format("YYYYMMDDHHmmss");
       const password = new Buffer.from(
-        "174379" +
-          "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" +
+        process.env.MPESA_SHORTCODE +
+          process.env.MPESA_PASSKEY +
           timestamp
       ).toString("base64");
 
@@ -89,16 +76,16 @@ app.get("/stkpush", (req, res) => {
         .post(
           url,
           {
-            BusinessShortCode: "174379",
+            BusinessShortCode: process.env.MPESA_SHORTCODE,
             Password: password,
             Timestamp: timestamp,
             TransactionType: "CustomerPayBillOnline",
-            Amount: "10",
-            PartyA: "", //phone number to receive the stk push
-            PartyB: "174379",
-            PhoneNumber: "",
-            CallBackURL: "https://dd3d-105-160-22-207.ngrok-free.app/callback",
-            AccountReference: "UMESKIA PAY",
+            Amount: "1",
+            PartyA: "07xxxxx",
+            PartyB: process.env.MPESA_SHORTCODE,
+            PhoneNumber: phone,
+            CallBackURL: process.env.MPESA_CALLBACK_URL,
+            AccountReference: "PAY",
             TransactionDesc: "Mpesa Daraja API stk push test",
           },
           {
@@ -137,16 +124,16 @@ app.post("/callback", (req, res) => {
 app.get("/registerurl", (req, resp) => {
   getAccessToken()
     .then((accessToken) => {
-      const url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
+      const url = process.env.MPESA_URL;
       const auth = "Bearer " + accessToken;
       axios
         .post(
           url,
           {
-            ShortCode: "174379",
-            ResponseType: "Complete",
-            ConfirmationURL: "http://example.com/confirmation",
-            ValidationURL: "http://example.com/validation",
+            ShortCode: process.env.MPESA_SHORTCODE,
+            ResponseType: "Completed",
+            ConfirmationURL: process.env.MPESA_CONFIRMATION_URL,
+            ValidationURL: process.env.MPESA_VALIDATION_URL,
           },
           {
             headers: {
@@ -179,23 +166,22 @@ app.get("/validation", (req, resp) => {
 app.get("/b2curlrequest", (req, res) => {
   getAccessToken()
     .then((accessToken) => {
-      const securityCredential =
-        "N3Lx/hisedzPLxhDMDx80IcioaSO7eaFuMC52Uts4ixvQ/Fhg5LFVWJ3FhamKur/bmbFDHiUJ2KwqVeOlSClDK4nCbRIfrqJ+jQZsWqrXcMd0o3B2ehRIBxExNL9rqouKUKuYyKtTEEKggWPgg81oPhxQ8qTSDMROLoDhiVCKR6y77lnHZ0NU83KRU4xNPy0hRcGsITxzRWPz3Ag+qu/j7SVQ0s3FM5KqHdN2UnqJjX7c0rHhGZGsNuqqQFnoHrshp34ac/u/bWmrApUwL3sdP7rOrb0nWasP7wRSCP6mAmWAJ43qWeeocqrz68TlPDIlkPYAT5d9QlHJbHHKsa1NA==";
-      const url = "https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest";
+      const securityCredential = process.env.MPESA_SECURITY_CREDENTIAL;
+      const url = process.env.MPESA_URL;
       const auth = "Bearer " + accessToken;
       axios
         .post(
           url,
           {
-            InitiatorName: "testapi",
-            SecurityCredential: securityCredential,
-            CommandID: "PromotionPayment",
-            Amount: "1",
-            PartyA: "600996",
-            PartyB: "",//phone number to receive the stk push
-            Remarks: "Withdrawal",
-            QueueTimeOutURL: "https://mydomain.com/b2c/queue",
-            ResultURL: "https://mydomain.com/b2c/result",
+            InitiatorName: process.env.MPESA_INITIATOR_NAME,
+            SecurityCredential: process.env.MPESA_SECURITY_CREDENTIAL,
+            CommandID: "BusinessPayment",
+            Amount: amount,
+            PartyA: process.env.MPESA_SHORTCODE,
+            PartyB: phone,
+            Remarks: "Withdrawal from Speed Quiz",
+            QueueTimeOutURL: process.env.MPESA_B2C_QUEUE_URL,
+            ResultURL: process.env.MPESA_B2C_RESULT_URL,
             Occasion: "Withdrawal",
           },
           {
