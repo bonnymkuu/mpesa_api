@@ -201,7 +201,7 @@ CALLBACK_URL=https://yourdomain.com/callback
 
 This project was made possible thanks to the help and mentorship of:
 
-- **[John Doe](https://github.com/alvin-kiveu)** – for teaching me how to integrate M-Pesa APIs and explaining Daraja's C2B, B2C, and STK Push processes clearly.
+- **[Alvin Kiveu](https://github.com/alvin-kiveu)** – for teaching me how to integrate M-Pesa APIs and explaining Daraja's C2B, B2C, and STK Push processes clearly.
 
 Special thanks to [Alvin Kiveu] for their guidance and support in helping me understand and implement M-Pesa API integration, including C2B, B2C, and STK Push.
 
